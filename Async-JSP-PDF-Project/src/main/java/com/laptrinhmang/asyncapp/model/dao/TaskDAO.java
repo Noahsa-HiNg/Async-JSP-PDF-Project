@@ -133,11 +133,15 @@ public class TaskDAO {
             } else {
                 System.out.println("Thành công: Tìm thấy " + tasks.size() + " Task cho user " + userIdToTest);
                 // In ra Task đầu tiên tìm thấy
-                ProcessingTask firstTask = tasks.get(0);
-                System.out.println("  -> Task ID: " + firstTask.getId());
-                System.out.println("  -> File Name: " + firstTask.getFileName());
-                System.out.println("  -> Status: " + firstTask.getStatus());
-                System.out.println("  -> Summary: " + firstTask.getResultSummary());
+                for (int i = 0;i < tasks.size();i++) {
+                	ProcessingTask firstTask = tasks.get(i);
+                	System.out.println(" ----------------------------");
+                    System.out.println("  -> Task ID: " + firstTask.getId());
+                    System.out.println("  -> File Name: " + firstTask.getFileName());
+                    System.out.println("  -> Status: " + firstTask.getStatus());
+                    System.out.println("  -> Summary: " + firstTask.getResultSummary());
+                }
+                
             }
 
         } catch (SQLException e) {
