@@ -1,5 +1,6 @@
 package com.laptrinhmang.asyncapp.model.worker;
 
+import com.laptrinhmang.asyncapp.model.bean.ProcessingTask;
 import com.laptrinhmang.asyncapp.model.dao.TaskDAO;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -11,7 +12,7 @@ public class PDFProcessingWorker implements Runnable{
 	private final int taskId;
 	private final String pdfFilePath;
 	private final TaskDAO taskDAO;
-	private static final String RESULT_DIR = "C:/async_results/";
+	private static final String RESULT_DIR = "E:/async_results/";
 	public PDFProcessingWorker(int taskId,String pdfFilePath, TaskDAO taskDAO) {
 		this.taskId = taskId;
 		this.pdfFilePath = pdfFilePath;
@@ -59,4 +60,29 @@ public class PDFProcessingWorker implements Runnable{
             } catch (SQLException ignored) { }
         }
 	}
+	public static void main(String[] args) {
+        TaskDAO taskDAO = new TaskDAO();
+        int userId = 1; 
+        String validFilePath = "E:/test.pdf"; 
+        String invalidFilePath = "/path/to/non_existent_file.pdf";
+        try {
+            System.out.println("--- TEST 1: KỊCH BẢN THÀNH CÔNG ---");
+            
+            // BƯỚC A: Tạo Task (status PENDING)
+            ProcessingTask p1 = new ProcessingTask(userId, "test.pdf", validFilePath);
+            int taskId1 = taskDAO.createTask(p1);
+            System.out.println("   -> Task PENDING ID: " + taskId1);
+
+            // BƯỚC B: Chạy Worker (chạy trực tiếp hàm run(), không dùng Executor)
+            PDFProcessingWorker worker1 = new PDFProcessingWorker(taskId1, validFilePath, taskDAO);
+            worker1.run(); 
+            
+            System.out.println("   -> KẾT QUẢ DB: Kiểm tra bảng processing_tasks. Status phải là COMPLETED.");
+            
+        } catch (SQLException e) {
+            System.err.println("Lỗi SQL trong quá trình TEST: " + e.getMessage());
+        }
+
+        
+    }
 }

@@ -1,5 +1,5 @@
 package com.laptrinhmang.asyncapp.model.dao;
-
+import java.sql.ResultSet;
 import com.laptrinhmang.asyncapp.model.bean.ProcessingTask;
 import com.laptrinhmang.asyncapp.util.DBConnectionUtil;
 import java.sql.Connection;
@@ -71,7 +71,37 @@ public class TaskDAO {
         }
         return taskList;
     }
+    public ProcessingTask getTaskById(int taskId) {
+        // 1. Câu lệnh SQL
+        String sql = "SELECT * FROM processing_tasks WHERE id = ?";
+        ProcessingTask task = null; 
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, taskId);
 
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    task = new ProcessingTask();
+                    task.setId(rs.getInt("id"));
+                    task.setUserId(rs.getInt("user_id"));
+                    task.setFileName(rs.getString("file_name"));
+                    task.setFilePath(rs.getString("file_path"));
+                    task.setStatus(rs.getString("status"));
+                    task.setResultSummary(rs.getString("result_summary"));
+                    task.setResultPath(rs.getString("result_path"));
+                    task.setCreatedAt(rs.getTimestamp("created_at"));
+                }
+               
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Lỗi khi lấy Task bằng ID (" + taskId + "): " + e.getMessage());
+        }
+        
+        // 8. Trả về kết quả
+        return task;
+    }
     
     public void updateTaskResult(int taskId, String summary, String resultPath) { 
     	String sql = "UPDATE processing_tasks set result_summary = ?,result_path = ? WHERE id = ?";
@@ -107,8 +137,6 @@ public class TaskDAO {
                 System.out.println("Thất bại: Không tạo được Task.");
                 return; // Dừng test nếu không tạo được
             }
-
-            // --- 2. Thử Test hàm updateTaskStatus ---
             System.out.println("\nĐang test updateTaskStatus()...");
             taskDAO.updateTaskStatus(newTaskId, "PROCESSING");
             System.out.println("Thành công: Đã cập nhật status cho Task ID " + newTaskId);
@@ -126,6 +154,7 @@ public class TaskDAO {
                 System.out.println("Lỗi: Không tìm thấy Task nào cho user " + userIdToTest);
             } else {
                 System.out.println("Thành công: Tìm thấy " + tasks.size() + " Task cho user " + userIdToTest);
+
                 for (int i = 0;i < tasks.size();i++) {
                 	ProcessingTask firstTask = tasks.get(i);
                 	System.out.println(" ----------------------------");
