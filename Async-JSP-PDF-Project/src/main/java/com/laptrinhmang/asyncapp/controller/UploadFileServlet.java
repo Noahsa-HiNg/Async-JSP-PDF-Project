@@ -30,6 +30,7 @@ public class UploadFileServlet extends HttpServlet {
 			return;
 		}
 		int currentId = (int)session.getAttribute("userId");
+		
 		File uploadDir = new File(UPLOAD_DIR);
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
@@ -42,6 +43,7 @@ public class UploadFileServlet extends HttpServlet {
 			ProcessingTask newTask = new ProcessingTask(currentId,fileName,tempFilePath);
 			int TaskId = taskDAO.createTask(newTask);
 			PDFProcessingWorker worker = new PDFProcessingWorker(TaskId, tempFilePath, taskDAO);
+			TaskQueueService.submit(worker);
 			response.sendRedirect(request.getContextPath() + "/status");
 		}catch (SQLException e) {
             request.setAttribute("error", "Lỗi DB khi tạo Task.");

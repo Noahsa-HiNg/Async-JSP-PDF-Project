@@ -51,7 +51,7 @@ public class RegisterController extends HttpServlet {
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
-        newUser.setPassword(password); // <-- DAO sẽ tự động hash mật khẩu này
+        newUser.setPassword(password); 
 
         // 3. Gọi API DAO để tạo user
         boolean isSuccess = userDAO.createUser(newUser);

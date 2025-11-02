@@ -47,6 +47,11 @@ public class PDFProcessingWorker implements Runnable{
 			String summary = "Hoàn thành. Số từ: " + wordCount;
             taskDAO.updateTaskResult(taskId, summary, resultPath); 
             taskDAO.updateTaskStatus(taskId, "COMPLETED");
+            File originalPdfFile = new File(pdfFilePath);
+            if (originalPdfFile.exists()) {
+                originalPdfFile.delete();
+                System.out.println("Task ID " + taskId + ": Đã dọn dẹp file PDF gốc.");
+            }
             System.out.println("Task ID " + taskId + ": Xử lý thành công. Số từ: " + wordCount);
 		}catch (SQLException eSQL) {
             System.err.println("Lỗi DB Worker Task " + taskId + ": " + eSQL.getMessage());

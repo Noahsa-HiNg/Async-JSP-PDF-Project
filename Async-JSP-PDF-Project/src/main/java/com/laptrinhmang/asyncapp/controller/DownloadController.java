@@ -28,12 +28,13 @@ public class DownloadController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // --- 1. KIỂM TRA ĐĂNG NHẬP ---
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bạn cần đăng nhập để tải file.");
-            return;
-        }
-        int currentUserId = (int) session.getAttribute("userId");
+//        HttpSession session = request.getSession(false);
+//        if (session == null || session.getAttribute("userId") == null) {
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bạn cần đăng nhập để tải file.");
+//            return;
+//        }
+//        int currentUserId = (int) session.getAttribute("userId");
+    	int currentUserId=1;
 
         // --- 2. LẤY TASK ID TỪ URL ---
         int taskId;
