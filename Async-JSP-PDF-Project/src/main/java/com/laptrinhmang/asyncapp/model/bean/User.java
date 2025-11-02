@@ -19,8 +19,6 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    // 4. Các phương thức Getter và Setter
-    // (Bắt buộc để JSTL/EL có thể truy cập, ví dụ: ${user.username})
     
     public int getId() {
         return id;

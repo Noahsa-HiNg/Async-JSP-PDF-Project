@@ -12,10 +12,6 @@ import java.util.List;
 
 public class TaskDAO {
 
-    /**
-     * Hàm này được UploadController (Người 3) gọi
-     * Trả về ID của task vừa tạo
-     */
     public int createTask(ProcessingTask task) throws SQLException {
         String sql = "INSERT INTO processing_tasks (user_id, file_name, file_path, status) VALUES (?, ?, ?, ?)";
         int generatedId = -1;
@@ -90,11 +86,9 @@ public class TaskDAO {
     		System.out.println("cập nhật lỗi " + e.getMessage());
     	}
     }
-    //thử task dao
     public static void main(String[] args) {
-        // Khởi tạo đối tượng DAO để gọi các hàm
         TaskDAO taskDAO = new TaskDAO();
-        int userIdToTest = 1; // Đảm bảo user có ID=1 tồn tại trong bảng 'users'
+        int userIdToTest = 1; 
         
         System.out.println("--- BẮT ĐẦU KIỂM TRA TASKDAO ---");
 
@@ -132,7 +126,6 @@ public class TaskDAO {
                 System.out.println("Lỗi: Không tìm thấy Task nào cho user " + userIdToTest);
             } else {
                 System.out.println("Thành công: Tìm thấy " + tasks.size() + " Task cho user " + userIdToTest);
-                // In ra Task đầu tiên tìm thấy
                 for (int i = 0;i < tasks.size();i++) {
                 	ProcessingTask firstTask = tasks.get(i);
                 	System.out.println(" ----------------------------");
