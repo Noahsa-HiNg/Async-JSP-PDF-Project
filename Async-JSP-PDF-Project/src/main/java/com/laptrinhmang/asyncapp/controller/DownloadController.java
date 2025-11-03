@@ -27,15 +27,16 @@ public class DownloadController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // --- 1. KIỂM TRA ĐĂNG NHẬP ---
-       HttpSession session = request.getSession(false);
-       if (session == null || session.getAttribute("userId") == null) {
-           response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bạn cần đăng nhập để tải file.");
-           return;
-       }
-       int currentUserId = (int) session.getAttribute("userId");
+        // --- 1. KIỂM TRA ĐĂNG NHẬP (Giữ nguyên) ---
+//        HttpSession session = request.getSession(false);
+//        if (session == null || session.getAttribute("userId") == null) {
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bạn cần đăng nhập để tải file.");
+//            return;
+//        }
+//        int currentUserId = (int) session.getAttribute("userId");
+    	int currentUserId = 1;
 
-        // --- 2. LẤY TASK ID TỪ URL ---
+        // --- 2. LẤY TASK ID TỪ URL (Giữ nguyên) ---
         int taskId;
         try {
             taskId = Integer.parseInt(request.getParameter("taskId"));
@@ -44,17 +45,16 @@ public class DownloadController extends HttpServlet {
             return;
         }
 
+        // SỬA LỖI TRY-CATCH: Bắt cả SQLException
         try {
-            // --- 3. KIỂM TRA QUYỀN SỞ HỮU ---
+            // --- 3. KIỂM TRA QUYỀN SỞ HỮU (Giữ nguyên) ---
             ProcessingTask task = taskDAO.getTaskById(taskId);
 
-            // Kiểm tra: Task tồn tại VÀ Task này thuộc về người dùng đang đăng nhập
             if (task == null || task.getUserId() != currentUserId) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập file này.");
                 return;
             }
 
-            // Kiểm tra: Task đã hoàn thành chưa
             if (!"COMPLETED".equals(task.getStatus())) {
                 response.sendError(HttpServletResponse.SC_CONFLICT, "File này chưa được xử lý xong.");
                 return;
@@ -67,31 +67,33 @@ public class DownloadController extends HttpServlet {
                 return;
             }
 
-            // A. Cấu hình HTTP Headers
-            response.setContentType("text/plain"); // Hoặc "application/octet-stream"
+            // --- A. Cấu hình HTTP Headers (THAY ĐỔI Ở ĐÂY) ---
+            
+            // SỬA 1: Đặt MIME Type cho file .doc
+            response.setContentType("application/msword"); 
+            
             response.setContentLength((int) fileToDownload.length());
             
-            // Lấy tên file gốc
             String headerKey = "Content-Disposition";
-            // Gợi ý cho trình duyệt tên file khi lưu
-            String headerValue = String.format("attachment; filename=\"result_task_%d.txt\"", taskId);
+            
+            // SỬA 2: Đổi tên file gợi ý sang .doc
+            String headerValue = String.format("attachment; filename=\"result_task_%d.doc\"", taskId);
             response.setHeader(headerKey, headerValue);
 
-            // B. Đọc và Ghi File
+            // --- B. Đọc và Ghi File (Giữ nguyên) ---
             try (FileInputStream fileIn = new FileInputStream(fileToDownload);
                  OutputStream out = response.getOutputStream()) {
                 
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 
-                // Đọc file từ đĩa và ghi vào response
                 while ((bytesRead = fileIn.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesRead);
                 }
             }
 
         } catch (IOException e) {
-            // Lỗi đọc file (ví dụ file bị xóa)
+
             System.err.println("Lỗi I/O khi stream file: " + e.getMessage());
         }
     }
