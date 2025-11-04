@@ -6,11 +6,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - Async Project</title>
+    <title>Upload File - Async Project</title>
 
     <!-- 
       CSS TÙY CHỈNH (DỰA TRÊN CÁC FILE BẠN CUNG CẤP)
-      Trích xuất từ filecss2.css và filecss3.css
+      Sử dụng chung style với trang login.jsp/register.jsp
     -->
     <style type="text/css">
         /* Reset mặc định */
@@ -27,6 +27,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 20px 0;
         }
         
         /* Tiêu đề (Lấy từ h2 trong filecss3.css) */
@@ -39,7 +40,7 @@
         /* Form (Lấy từ .form-container trong filecss3.css) */
         .form-container {
             width: 90%;
-            max-width: 400px; /* Thu hẹp cho form đăng nhập */
+            max-width: 500px; /* Rộng hơn form login một chút */
             margin: 20px auto;
             padding: 30px;
             background: white;
@@ -47,34 +48,33 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
-        /* CSS cho các dòng input */
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #34495e;
-        }
-
-        /* Input (Lấy từ filecss3.css) */
-        input[type="text"],
-        input[type="password"] {
+        /* CSS cho input[type=file] */
+        input[type="file"] {
             width: 100%;
-            padding: 12px; /* Tăng padding cho đẹp hơn */
+            padding: 10px;
             margin-top: 5px;
+            margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
+            background: white;
         }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            border-color: #1abc9c; /* Viền xanh khi focus */
-            outline: none;
-            box-shadow: 0 0 5px rgba(26, 188, 156, 0.3);
+        
+        /* Tùy chỉnh giao diện cho nút "Choose File" */
+        input[type="file"]::file-selector-button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #34495e; /* Màu nền từ header bảng */
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+        
+        input[type="file"]::file-selector-button:hover {
+             background-color: #2c3e50;
         }
 
         /* Nút bấm (Lấy từ filecss3.css) */
@@ -95,7 +95,7 @@
             background-color: #16a085;
         }
         
-        /* Link Đăng ký (ở dưới cùng) */
+        /* Link xem Trạng thái (ở dưới cùng) */
         .form-footer {
             text-align: center;
             margin-top: 20px;
@@ -117,30 +117,34 @@
     <!-- Áp dụng class .form-container -->
     <div class="form-container">
         
-        <h2>Đăng nhập hệ thống</h2>
+        <h2>Tải lên File PDF</h2>
 
         <!-- 
-          Form trỏ action đến LoginController
+          QUAN TRỌNG: Form upload file BẮT BUỘC phải có:
+          1. method="POST"
+          2. enctype="multipart/form-data" (Rất quan trọng)
+          3. Action trỏ đến UploadFileServlet của bạn
         -->
-        <form action="${pageContext.request.contextPath}/login" method="POST">
+        <form action="${pageContext.request.contextPath}/upload" method="POST" enctype="multipart/form-data">
             
             <div class="form-group">
-                <label for="username">Tên đăng nhập</label>
-                <input id="username" name="username" type="text" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Mật khẩu</label>
-                <input id="password" name="password" type="password" required>
+                <label for="pdf-file">Chọn file PDF để xử lý:</label>
+                <!-- 
+                  SỬA LỖI:
+                  Đổi name="file" thành name="pdfFile" 
+                  để khớp với request.getPart("pdfFile") 
+                  trong UploadFileServlet.java
+                -->
+                <input id="pdf-file" name="pdfFile" type="file" accept=".pdf" required>
             </div>
 
             <div>
-                <input type="submit" value="Đăng nhập">
+                <input type="submit" value="Tải lên và Xử lý">
             </div>
             
             <div class="form-footer">
-                <a href="${pageContext.request.contextPath}/register">
-                    Chưa có tài khoản? Đăng ký
+                <a href="${pageContext.request.contextPath}/status">
+                    Xem danh sách tác vụ
                 </a>
             </div>
         </form>

@@ -18,11 +18,34 @@ import java.sql.SQLException;
                  maxFileSize = 1024 * 1024 * 100,  // 100MB
                  maxRequestSize = 1024 * 1024 * 150) // 150MB
 public class UploadFileServlet extends HttpServlet {
+	
 	private static final String UPLOAD_DIR = "E:/async_results/";
 	private TaskDAO taskDAO;
+	
 	public void init() {
 		taskDAO = new TaskDAO();
 	}
+
+    /**
+     * PHẦN THÊM VÀO: Xử lý GET request (Sửa lỗi 405)
+     * Nhiệm vụ của GET là HIỂN THỊ trang upload file (upload.jsp).
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Chuyển tiếp đến trang JSP để hiển thị form upload
+        request.getRequestDispatcher("/WEB-INF/jsp/upload.jsp").forward(request, response);
+    }
+
+    /**
+     * PHẦN CÓ SẴN: Xử lý POST request
+     * Nhiệm vụ của POST là nhận file và đưa vào hàng đợi.
+     */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("userId") == null) {
@@ -35,22 +58,36 @@ public class UploadFileServlet extends HttpServlet {
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
 		}
+		
 		try {
-			Part filePart = request.getPart("pdfFile");
+			// Tên "pdfFile" này phải khớp với 'name' trong form của upload.jsp
+			Part filePart = request.getPart("pdfFile"); 
 			String fileName = filePart.getSubmittedFileName();
 			String tempFilePath = UPLOAD_DIR + System.currentTimeMillis() + "_" + fileName;
+			
+			// 1. Lưu file tạm
 			filePart.write(tempFilePath);
-			ProcessingTask newTask = new ProcessingTask(currentId,fileName,tempFilePath);
-			int TaskId = taskDAO.createTask(newTask);
+			
+			// 2. Tạo Task trong DB (status: PENDING)
+			ProcessingTask newTask = new ProcessingTask(currentId, fileName, tempFilePath);
+			int TaskId = taskDAO.createTask(newTask); // Gọi Người 1
+			
+			// 3. Tạo Worker và đưa vào hàng đợi (Queue)
 			PDFProcessingWorker worker = new PDFProcessingWorker(TaskId, tempFilePath, taskDAO);
-			TaskQueueService.submit(worker);
+			TaskQueueService.submit(worker); // Gọi Người 2
+			
+			// 4. Trả về trang status ngay lập tức
 			response.sendRedirect(request.getContextPath() + "/status");
-		}catch (SQLException e) {
+			
+		} catch (SQLException e) {
             request.setAttribute("error", "Lỗi DB khi tạo Task.");
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            // Sửa lỗi: Chuyển về trang upload để báo lỗi
+            request.getRequestDispatcher("/WEB-INF/jsp/upload.jsp").forward(request, response);
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi khi xử lý file upload: " + e.getMessage());
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            // Sửa lỗi: Chuyển về trang upload để báo lỗi
+            request.getRequestDispatcher("/WEB-INF/jsp/upload.jsp").forward(request, response);
         }
 	}
 }
+
