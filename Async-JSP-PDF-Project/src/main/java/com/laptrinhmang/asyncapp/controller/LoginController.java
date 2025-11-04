@@ -32,7 +32,7 @@ public class LoginController extends HttpServlet {
         // Kiểm tra xem người dùng đã đăng nhập chưa
         if (session != null && session.getAttribute("username") != null) {
             // Nếu đã đăng nhập, chuyển hướng về trang chủ
-            response.sendRedirect(request.getContextPath() + "/home"); // Giả sử /home là trang chính
+            response.sendRedirect(request.getContextPath() + "/status"); // Giả sử /home là trang chính
         } else {
             // Nếu chưa đăng nhập, hiển thị form login
             request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
@@ -65,7 +65,7 @@ public class LoginController extends HttpServlet {
             session.setMaxInactiveInterval(30 * 60);
             
             // 4. Chuyển hướng đến trang chính sau khi đăng nhập
-            response.sendRedirect(request.getContextPath() + "/home"); // Giả sử /home là trang chính
+            response.sendRedirect(request.getContextPath() + "/status"); // Giả sử /home là trang chính
 
         } else {
             // --- ĐĂNG NHẬP THẤT BẠI ---
