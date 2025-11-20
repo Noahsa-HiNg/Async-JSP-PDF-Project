@@ -2,6 +2,8 @@ package com.laptrinhmang.asyncapp.model.worker;
 
 import com.laptrinhmang.asyncapp.model.bean.ProcessingTask;
 import com.laptrinhmang.asyncapp.model.dao.TaskDAO;
+import com.laptrinhmang.asyncapp.util.DBConnectionUtil;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
@@ -16,13 +18,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List; // Import dự phòng
-
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 public class PDFProcessingWorker implements Runnable {
     
     private final int taskId;
     private final String pdfFilePath;
     private final TaskDAO taskDAO;
-    private static final String RESULT_DIR = "D:/async_results/";
+    //private static final String RESULT_DIR = "D:/async_results/";
+    private final String RESULT_DIR = DBConnectionUtil.getResultDir();
 
     public PDFProcessingWorker(int taskId, String pdfFilePath, TaskDAO taskDAO) {
         this.taskId = taskId;
@@ -38,9 +41,17 @@ public class PDFProcessingWorker implements Runnable {
             System.out.println("Task ID " + taskId + ": Bắt đầu xử lý file...");
             File pdfFile = new File(pdfFilePath);
             String extractedText = "";
+            
             try (PDDocument document = PDDocument.load(pdfFile)) {
                 PDFTextStripper stripper = new PDFTextStripper();
                 extractedText = stripper.getText(document);
+            }catch (InvalidPasswordException e) {
+                System.err.println("Task ID " + taskId + ": File PDF có mật khẩu -> Dừng xử lý.");
+                taskDAO.updateTaskResult(taskId, "Lỗi: File PDF có mật khẩu, không thể xử lý.", null);
+                taskDAO.updateTaskStatus(taskId, "FAILED");
+                if (pdfFile.exists()) pdfFile.delete();
+                
+                return; 
             }
 
             int wordCount = 0;
@@ -50,6 +61,7 @@ public class PDFProcessingWorker implements Runnable {
             resultPath = RESULT_DIR + "result_" + taskId + ".doc";
             File resultFile = new File(resultPath);
             resultFile.getParentFile().mkdirs();
+            
             InputStream templateStream = getClass().getClassLoader().getResourceAsStream("blank_template.doc");
             if (templateStream == null) {
                 throw new IOException("Không tìm thấy file mẫu 'blank_template.doc' trong resources.");

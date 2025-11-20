@@ -4,6 +4,7 @@ import com.laptrinhmang.asyncapp.model.bean.ProcessingTask;
 import com.laptrinhmang.asyncapp.model.dao.TaskDAO;
 import com.laptrinhmang.asyncapp.model.service.TaskQueueService;
 import com.laptrinhmang.asyncapp.model.worker.PDFProcessingWorker;
+import com.laptrinhmang.asyncapp.util.DBConnectionUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig; // QUAN TRỌNG CHO UPLOAD
@@ -19,7 +20,8 @@ import java.sql.SQLException;
                  maxRequestSize = 1024 * 1024 * 150) // 150MB
 public class UploadFileServlet extends HttpServlet {
 	
-	private static final String UPLOAD_DIR = "D:/async_results/";
+	//private static final String UPLOAD_DIR = "D:/async_results/";
+	private final String UPLOAD_DIR = DBConnectionUtil.getUploadDir();
 	private TaskDAO taskDAO;
 	
 	public void init() {
