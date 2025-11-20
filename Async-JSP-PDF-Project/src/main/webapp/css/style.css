@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Ảnh nền mẫu (bạn có thể thay bằng 8k.jpg của bạn) */
+    background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop') no-repeat;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+}
+
+/* --- KHUNG CHỨA CHÍNH (GLASSMORPHISM) --- */
+.wrapper {
+    width: 100%;
+    max-width: 450px; /* Mặc định cho form nhỏ */
+    background: transparent;
+    border: 2px solid rgba(255,255,255,.2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 40px;
+    margin: 20px;
+}
+
+/* Class riêng cho trang Status (cần rộng hơn) */
+.wrapper.wide {
+    max-width: 1000px;
+}
+
+h1, h2 {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* --- INPUT BOX --- */
+.input-box {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 30px 0;
+}
+
+.input-box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    border: 2px solid rgba(255,255,255,.2);
+    border-radius: 40px;
+    font-size: 16px;
+    color: #fff;
+    padding: 20px 45px 20px 20px;
+}
+
+.input-box input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Icon trong input */
+.input-box i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+}
+
+/* --- INPUT FILE (Tùy chỉnh) --- */
+.file-upload-wrapper {
+    margin: 30px 0;
+    text-align: center;
+    border: 2px dashed rgba(255,255,255,0.5);
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.file-upload-wrapper:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+input[type="file"] {
+    display: none; /* Ẩn input gốc */
+}
+
+.file-upload-label {
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-upload-label i {
+    font-size: 40px;
+}
+
+/* --- BUTTONS --- */
+.btn {
+    width: 100%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.02);
+}
+
+/* Nút nhỏ (cho bảng) */
+.btn-sm {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-decoration: none;
+    display: inline-block;
+    width: auto;
+    height: auto;
+}
+
+/* Link đăng ký/đăng nhập */
+.register-link, .login-link {
+    font-size: 14.5px;
+    text-align: center;
+    margin: 20px 0 15px;
+}
+
+.register-link p a, .login-link a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link p a:hover, .login-link a:hover {
+    text-decoration: underline;
+}
+
+/* --- THÔNG BÁO LỖI/THÀNH CÔNG --- */
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+.alert-error {
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid #e74c3c;
+    color: #ffcece;
+}
+.alert-success {
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid #2ecc71;
+    color: #d4efdf;
+}
+
+/* --- THANH TIẾN TRÌNH (PROGRESS BAR) --- */
+.progress-container {
+    width: 100%;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    margin-top: 20px;
+    display: none; /* Ẩn mặc định */
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 10px;
+    background-color: #2ecc71;
+    border-radius: 20px;
+    transition: width 0.2s;
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none;
+}
+
+/* --- BẢNG (TABLE) CHO TRANG STATUS --- */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+th {
+    background: rgba(255,255,255,0.1);
+    font-weight: 600;
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* Badge trạng thái */
+.badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.badge-pending { background: rgba(241, 196, 15, 0.3); color: #f1c40f; }
+.badge-processing { background: rgba(52, 152, 219, 0.3); color: #3498db; }
+.badge-completed { background: rgba(46, 204, 113, 0.3); color: #2ecc71; }
+.badge-failed { background: rgba(231, 76, 60, 0.3); color: #e74c3c; }
