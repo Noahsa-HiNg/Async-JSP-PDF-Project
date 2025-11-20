@@ -22,7 +22,7 @@ public class PDFProcessingWorker implements Runnable {
     private final int taskId;
     private final String pdfFilePath;
     private final TaskDAO taskDAO;
-    private static final String RESULT_DIR = "E:/async_results/";
+    private static final String RESULT_DIR = "D:/async_results/";
 
     public PDFProcessingWorker(int taskId, String pdfFilePath, TaskDAO taskDAO) {
         this.taskId = taskId;
@@ -94,7 +94,7 @@ public class PDFProcessingWorker implements Runnable {
     public static void main(String[] args) {
         TaskDAO taskDAO = new TaskDAO();
         int userId = 1; 
-        String validFilePath = "E:/test.pdf"; 
+        String validFilePath = "D:/test.pdf"; 
         String invalidFilePath = "/path/to/non_existent_file.pdf";
         try {
             System.out.println("--- TEST 1: KỊCH BẢN THÀNH CÔNG (.DOC) ---");

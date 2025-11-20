@@ -13,6 +13,6 @@ public class AppLifecycleListener implements ServletContextListener{
 	@Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("--- Task Queue Service Initialized ---");
-        // TaskQueueService tự khởi tạo do ExecutorService là static
+
     }
 }

@@ -27,16 +27,13 @@ public class DownloadController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // --- 1. KIỂM TRA ĐĂNG NHẬP (Giữ nguyên) ---
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bạn cần đăng nhập để tải file.");
             return;
         }
         int currentUserId = (int) session.getAttribute("userId");
-//    	int currentUserId = 1;
 
-        // --- 2. LẤY TASK ID TỪ URL (Giữ nguyên) ---
         int taskId;
         try {
             taskId = Integer.parseInt(request.getParameter("taskId"));
@@ -45,9 +42,7 @@ public class DownloadController extends HttpServlet {
             return;
         }
 
-        // SỬA LỖI TRY-CATCH: Bắt cả SQLException
         try {
-            // --- 3. KIỂM TRA QUYỀN SỞ HỮU (Giữ nguyên) ---
             ProcessingTask task = taskDAO.getTaskById(taskId);
 
             if (task == null || task.getUserId() != currentUserId) {
@@ -60,27 +55,32 @@ public class DownloadController extends HttpServlet {
                 return;
             }
 
-            // --- 4. STREAM FILE VỀ CLIENT ---
             File fileToDownload = new File(task.getResultPath());
             if (!fileToDownload.exists()) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "File kết quả không còn tồn tại trên server.");
                 return;
             }
 
-            // --- A. Cấu hình HTTP Headers (THAY ĐỔI Ở ĐÂY) ---
-            
-            // SỬA 1: Đặt MIME Type cho file .doc
-            response.setContentType("application/msword"); 
-            
+            response.setContentType("application/msword");
             response.setContentLength((int) fileToDownload.length());
-            
+
+            String originalName = task.getFileName();
+            String downloadName = "document.doc"; 
+
+            if (originalName != null && !originalName.isEmpty()) {
+                int lastDotIndex = originalName.lastIndexOf(".");
+                if (lastDotIndex > 0) {
+                    downloadName = originalName.substring(0, lastDotIndex) + ".doc";
+                } else {
+                    downloadName = originalName + ".doc";
+                }
+            }
+
             String headerKey = "Content-Disposition";
-            
-            // SỬA 2: Đổi tên file gợi ý sang .doc
-            String headerValue = String.format("attachment; filename=\"result_task_%d.doc\"", taskId);
+
+            String headerValue = String.format("attachment; filename=\"%s\"", downloadName);
             response.setHeader(headerKey, headerValue);
 
-            // --- B. Đọc và Ghi File (Giữ nguyên) ---
             try (FileInputStream fileIn = new FileInputStream(fileToDownload);
                  OutputStream out = response.getOutputStream()) {
                 
@@ -93,7 +93,6 @@ public class DownloadController extends HttpServlet {
             }
 
         } catch (IOException e) {
-
             System.err.println("Lỗi I/O khi stream file: " + e.getMessage());
         }
     }
