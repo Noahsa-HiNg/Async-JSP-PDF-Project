@@ -2,6 +2,8 @@ package com.laptrinhmang.asyncapp.model.dao;
 import java.sql.ResultSet;
 import com.laptrinhmang.asyncapp.model.bean.ProcessingTask;
 import com.laptrinhmang.asyncapp.util.DBConnectionUtil;
+
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -115,6 +117,47 @@ public class TaskDAO {
     	}catch(SQLException e) {
     		System.out.println("cập nhật lỗi " + e.getMessage());
     	}
+    }
+
+    public void resetStuckTasks() {
+        String selectSql = "SELECT id, file_path, result_path FROM processing_tasks WHERE status = 'PROCESSING'";
+        String updateSql = "UPDATE processing_tasks SET status = 'FAILED', result_summary = 'Lỗi: Server tắt đột ngột, file đã bị xóa' WHERE id = ?";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement psSelect = conn.prepareStatement(selectSql);
+             PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+            
+            try (ResultSet rs = psSelect.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    int taskId = rs.getInt("id");
+                    String inputPath = rs.getString("file_path");
+                    String outputPath = rs.getString("result_path");
+                    if (inputPath != null) {
+                        File inputFile = new File(inputPath);
+                        if (inputFile.exists()) {
+                            inputFile.delete();
+                            System.out.println("Cleanup: Đã xóa file gốc task " + taskId);
+                        }
+                    }
+                    if (outputPath != null) {
+                        File outputFile = new File(outputPath);
+                        if (outputFile.exists()) {
+                            outputFile.delete();
+                            System.out.println("Cleanup: Đã xóa file lỗi task " + taskId);
+                        }
+                    }
+                    psUpdate.setInt(1, taskId);
+                    psUpdate.executeUpdate();
+                    count++;
+                }
+                if (count > 0) {
+                    System.out.println("--- Đã dọn dẹp và phục hồi " + count + " task bị treo ---");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     public static void main(String[] args) {
         TaskDAO taskDAO = new TaskDAO();

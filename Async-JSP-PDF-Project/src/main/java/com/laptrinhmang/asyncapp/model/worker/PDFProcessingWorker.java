@@ -34,11 +34,8 @@ public class PDFProcessingWorker implements Runnable {
     public void run() {
         String resultPath = null;
         try {
-            // 1. Cập nhật trạng thái "PROCESSING"
             taskDAO.updateTaskStatus(taskId, "PROCESSING");
             System.out.println("Task ID " + taskId + ": Bắt đầu xử lý file...");
-            
-            // 2. Trích xuất Text từ PDF (Giữ nguyên)
             File pdfFile = new File(pdfFilePath);
             String extractedText = "";
             try (PDDocument document = PDDocument.load(pdfFile)) {
@@ -50,16 +47,14 @@ public class PDFProcessingWorker implements Runnable {
             if (extractedText != null && !extractedText.trim().isEmpty()) {
                 wordCount = extractedText.split("\\s+").length;
             }
-
-            // === 3. THAY ĐỔI LOGIC: GHI FILE .DOC ===
-            resultPath = RESULT_DIR + "result_" + taskId + ".doc"; // Đổi đuôi file
+            resultPath = RESULT_DIR + "result_" + taskId + ".doc";
             File resultFile = new File(resultPath);
             resultFile.getParentFile().mkdirs();
             InputStream templateStream = getClass().getClassLoader().getResourceAsStream("blank_template.doc");
             if (templateStream == null) {
                 throw new IOException("Không tìm thấy file mẫu 'blank_template.doc' trong resources.");
             }
-            // 3a. Tạo một tài liệu Word (.doc) rỗng
+
             try (HWPFDocument doc = new HWPFDocument(templateStream);
                  FileOutputStream out = new FileOutputStream(resultFile)) {
                 Range range = doc.getRange();

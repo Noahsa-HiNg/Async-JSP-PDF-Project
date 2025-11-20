@@ -19,7 +19,7 @@ import java.sql.SQLException;
                  maxRequestSize = 1024 * 1024 * 150) // 150MB
 public class UploadFileServlet extends HttpServlet {
 	
-	private static final String UPLOAD_DIR = "E:/async_results/";
+	private static final String UPLOAD_DIR = "D:/async_results/";
 	private TaskDAO taskDAO;
 	
 	public void init() {
@@ -57,8 +57,11 @@ public class UploadFileServlet extends HttpServlet {
 			filePart.write(tempFilePath);
 			ProcessingTask newTask = new ProcessingTask(currentId, fileName, tempFilePath);
 			int TaskId = taskDAO.createTask(newTask); 
+			
 			PDFProcessingWorker worker = new PDFProcessingWorker(TaskId, tempFilePath, taskDAO);
 			TaskQueueService.submit(worker); 
+			
+			
 			response.sendRedirect(request.getContextPath() + "/status");
 			
 		} catch (SQLException e) {

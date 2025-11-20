@@ -2,6 +2,8 @@ package com.laptrinhmang.asyncapp.listener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+
+import com.laptrinhmang.asyncapp.model.dao.TaskDAO;
 import com.laptrinhmang.asyncapp.model.service.TaskQueueService;
 @WebListener
 public class AppLifecycleListener implements ServletContextListener{
@@ -12,7 +14,12 @@ public class AppLifecycleListener implements ServletContextListener{
     }
 	@Override
     public void contextInitialized(ServletContextEvent sce) {
+        System.out.println("--- Server Starting: Cleaning up stuck tasks ---");
+        
+        // Gọi DAO để dọn dẹp các task bị treo
+        TaskDAO taskDAO = new TaskDAO();
+        taskDAO.resetStuckTasks();
+        
         System.out.println("--- Task Queue Service Initialized ---");
-
     }
 }
