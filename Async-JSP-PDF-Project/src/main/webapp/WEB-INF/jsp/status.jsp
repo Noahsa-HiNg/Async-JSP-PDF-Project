@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,9 +9,10 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <meta http-equiv="refresh" content="5">
 </head>
 <body>
-    <div class="wrapper wide"> <!-- Class wide để bảng rộng hơn -->
+    <div class="wrapper wide">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h1>Task Dashboard</h1>
             <div>
@@ -22,7 +25,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Time</th>
                         <th>File Name</th>
                         <th>Status</th>
                         <th>Result</th>
@@ -32,7 +35,10 @@
                 <tbody>
                     <c:forEach var="task" items="${taskList}">
                         <tr>
-                            <td>#${task.id}</td>
+                            <td style="white-space: nowrap;">
+                                <fmt:formatDate value="${task.createdAt}" pattern="HH:mm dd/MM/yyyy" />
+                            </td>
+
                             <td>${task.fileName}</td>
                             <td>
                                 <c:choose>
